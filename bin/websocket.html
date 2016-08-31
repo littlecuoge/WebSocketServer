@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta charset="UTF-8">
+netty websocket
+</head>
+<br>
+<body>
+<br>
+<script type="text/javascript">
+var socket;
+var id;
+var touser;
+if(!window.WebSocket){
+	window.WebSocket = window.MozWebSocket;
+}
+if(window.WebSocket){
+	socket = new WebSocket("ws://localhost:8080");
+	
+	socket.onmessage = function(event){
+		var ta = document.getElementById('responseText');
+		ta.value =  ta.value + event.data+ "\n";
+	};
+	socket.onopen = function(event){
+		id=prompt("请输入您的ID:","1");
+		touser=prompt("请输入对方id:","2");
+		send("");
+		//confirm("打开websocket服务正常。");
+	};
+	socket.onclose = function(event){
+		var ta = document.getElementById('responseText');
+		ta.value = "";
+		ta.value =  "websocket closed.";
+	};
+}
+else{
+	alert("sorry, your webrower cannt support websocket!");
+}
+
+function send(message){
+	if(!window.WebSocket){
+		return;
+	}
+	var msg = new Object();
+	msg.id=id;
+	msg.toname=touser;
+	msg.content = message;
+	var json = JSON.stringify(msg);
+	if(socket.readyState == WebSocket.OPEN){
+		socket.send(json);
+	}
+	else{
+		alert("websocket failed to connect.");
+	}
+}
+
+function clean(){
+	var ta = document.getElementById('responseText');
+	ta.value = "";
+}
+</script>
+<form onsubmit="return false;">
+<input type="text" name="message" value="nettyInAction" />
+<br><br>
+<input type="button" value="发送" onclick="send(this.form.message.value)" />
+&nbsp
+<input type="button" value="清空" onclick="clean()" />
+<hr color="blue"/>
+<h3>服务端返回的应答消息</h3>
+<textarea id="responseText" style="width:500px;height:300px;"></textarea>
+</form>
+</body>
+</html>
+
+
+
+
